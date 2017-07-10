@@ -1,15 +1,18 @@
-package com.maximka.taskmanager;
+package com.maximka.taskmanager.ui.activity;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import com.maximka.taskmanager.R;
+import com.maximka.taskmanager.ui.navigation.Navigator;
+
+public class MainActivity extends AppCompatActivity implements ActivityView {
+    @NonNull private final ActivityPresenter presenter = new ActivityPresenter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +23,13 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(view ->
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show());
+//                presenter.onCreateTaskButtonClicked()
+                Navigator.navigateToCreateScreen(getSupportFragmentManager())
+        );
+
+        if (savedInstanceState == null) {
+            Navigator.navigateToTaskListFragment(getSupportFragmentManager());
+        }
     }
 
     @Override

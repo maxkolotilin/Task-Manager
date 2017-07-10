@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Task Manager</string>
     <string name="action_settings">Settings</string>
+    <string name="task_loading_error">Couldn\'t load tasks!</string>
+    <string name="task_list_empty_message">Seems that your task list is empty.</string>
+    <string name="due_date_label">Due Date:</string>
+    <string name="task_state_new">New</string>
+    <string name="task_state_in_progress">In Progress</string>
+    <string name="task_state_done">Done</string>
+    <string name="task_progress_format_string">%d%% Completed</string>
 </resources>
