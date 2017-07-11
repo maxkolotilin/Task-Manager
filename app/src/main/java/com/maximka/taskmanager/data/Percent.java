@@ -7,19 +7,26 @@ import android.support.annotation.Nullable;
 import com.annimon.stream.Objects;
 
 public final class Percent {
+    private static final int MIN_VALUE = 0;
+    private static final int MAX_VALUE = 100;
+
     private final int mPercent;
 
     public static Percent zero() {
-        return new Percent(0);
+        return new Percent(MIN_VALUE);
     }
 
-    public Percent(@IntRange(from=0, to=100) final int percent) {
-        if (percent < 0 || percent > 100)
+    public Percent(@IntRange(from=MIN_VALUE, to=MAX_VALUE) final int percent) {
+        if (percent < MIN_VALUE || percent > MAX_VALUE)
         {
             throw new IllegalArgumentException("Progress percent value must be an integer in range [0, 100]");
         }
 
         this.mPercent = percent;
+    }
+
+    public boolean isAtMax() {
+        return mPercent == MAX_VALUE;
     }
 
     public int asInt() {

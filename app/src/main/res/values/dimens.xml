@@ -3,12 +3,22 @@
     <dimen name="task_item_elevation">2dp</dimen>
     <dimen name="task_item_corner_radius">0dp</dimen>
     <dimen name="task_item_content_margin">16dp</dimen>
-    <dimen name="task_item_vertical_margin">4dp</dimen>
+    <dimen name="task_item_vertical_margin">8dp</dimen>
+    <dimen name="task_item_horizontal_margin">16dp</dimen>
+    <dimen name="task_item_title_margin_bottom">16dp</dimen>
+    <dimen name="task_item_due_date_margin_bottom">16dp</dimen>
 
     <dimen name="font_size_small">14sp</dimen>
     <dimen name="font_size_normal">16sp</dimen>
     <dimen name="font_size_large">18sp</dimen>
     <dimen name="font_size_extra_large">20sp</dimen>
+    <dimen name="font_size_huge">26sp</dimen>
     <dimen name="task_due_date_left_margin">6dp</dimen>
     <dimen name="input_bottom_margin">8dp</dimen>
+    <dimen name="fragment_content_margin">24dp</dimen>
+    <dimen name="details_title_bottom_margin">24dp</dimen>
+    <dimen name="details_date_time_bottom_margin">8dp</dimen>
+    <dimen name="details_state_vertical_margin">24dp</dimen>
+    <dimen name="details_description_top_margin">24dp</dimen>
+
 </resources>

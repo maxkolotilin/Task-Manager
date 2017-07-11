@@ -7,6 +7,8 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/task_item_vertical_margin"
     android:layout_marginBottom="@dimen/task_item_vertical_margin"
+    android:layout_marginStart="@dimen/task_item_horizontal_margin"
+    android:layout_marginEnd="@dimen/task_item_horizontal_margin"
     app:cardElevation="@dimen/task_item_elevation"
     app:cardCornerRadius="@dimen/task_item_corner_radius"
     android:foreground="?android:attr/selectableItemBackground">
@@ -21,7 +23,7 @@
             android:id="@+id/task_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="@dimen/task_item_title_margin_bottom"
             android:textSize="@dimen/font_size_extra_large"
             android:textColor="@color/text_color_primary"
             tools:text="Sample title title title title title title title title" />
@@ -29,7 +31,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="@dimen/task_item_due_date_margin_bottom"
             android:orientation="horizontal">
 
             <TextView
@@ -76,7 +78,7 @@
                 android:layout_toStartOf="@id/task_progress"
                 android:textSize="@dimen/font_size_large"
                 android:textColor="@color/text_color_secondary"
-                tools:text="Status" />
+                tools:text="State" />
 
         </RelativeLayout>
 

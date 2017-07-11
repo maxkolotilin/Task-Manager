@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class TaskStateFormatter {
     @NonNull private static final
-    Map<TaskState, Integer> sStatusStringsMap =
+    Map<TaskState, Integer> sStateStringsMap =
                                 new EnumMap<TaskState, Integer>(TaskState.class) {{
                                     put(TaskState.NEW, R.string.task_state_new);
                                     put(TaskState.IN_PROGRESS, R.string.task_state_in_progress);
@@ -22,7 +22,7 @@ public class TaskStateFormatter {
     public static String format(@NonNull final TaskState state, @NonNull final Context context) {
         Assertion.nonNull(state, context);
 
-        final Integer stringResId = sStatusStringsMap.get(state);
+        final Integer stringResId = sStateStringsMap.get(state);
         if (stringResId == null) {
             throw new IllegalArgumentException("No string for TaskState.");
         } else {

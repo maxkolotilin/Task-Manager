@@ -14,6 +14,8 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 public class TaskDataRealm extends RealmObject {
+    public static final String ID = "mId";
+
     @PrimaryKey
     @NonNull
     private String mId = UUID.randomUUID().toString();

@@ -14,4 +14,8 @@
     <string name="input_estimated_time_label">Estimated Time</string>
     <string name="create_task_error_message">Blank fields are not allowed</string>
     <string name="estimated_time_format_string">%1$dh %2$dm</string>
+    <string name="details_start_date_format_string">Created at %s</string>
+    <string name="details_due_date_format_string">Due date: %s</string>
+    <string name="details_estimated_time_format_string">Estimated Time: %s</string>
+    <string name="detail_task_load_error">Could\'t load the task</string>
 </resources>

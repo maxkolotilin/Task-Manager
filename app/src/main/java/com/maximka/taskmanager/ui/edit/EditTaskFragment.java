@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.create;
+package com.maximka.taskmanager.ui.edit;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.annimon.stream.Optional;
 import com.maximka.taskmanager.R;
+import com.maximka.taskmanager.data.TaskData;
 import com.maximka.taskmanager.data.TimeInterval;
 import com.maximka.taskmanager.formatters.DateFormatter;
 import com.maximka.taskmanager.formatters.TimeIntervalFormatter;
@@ -22,16 +24,32 @@ import com.maximka.taskmanager.utils.KeyboardUtils;
 
 import java.util.Date;
 
-public final class CreateTaskFragment extends Fragment implements CreateTaskView {
+public final class EditTaskFragment extends Fragment implements EditTaskView {
+    private static final String TASK_ID_ARG = "taskId";
+
     private TextInputEditText mTitleEditView;
     private TextInputEditText mDescriptionEditView;
     private TextInputEditText mDueDateEditView;
     private TextInputEditText mEstimatedTimeEditView;
-    private CreateFragmentPresenter mPresenter;
+    private EditTaskPresenter mPresenter;
     private DialogManager mDialogManager;
 
-    public static CreateTaskFragment newInstance() {
-        return new CreateTaskFragment();
+    // Used for create new task
+    public static EditTaskFragment newInstance() {
+        return new EditTaskFragment();
+    }
+
+    // Used for update existing task
+    public static EditTaskFragment newInstance(@NonNull final String taskId) {
+        Assertion.nonNull(taskId);
+
+        final Bundle arguments = new Bundle();
+        arguments.putString(TASK_ID_ARG, taskId);
+
+        final EditTaskFragment fragment = newInstance();
+        fragment.setArguments(arguments);
+
+        return fragment;
     }
 
     @Nullable
@@ -39,7 +57,7 @@ public final class CreateTaskFragment extends Fragment implements CreateTaskView
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.create_task_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.task_edit_fragment, container, false);
         mTitleEditView = (TextInputEditText) rootView.findViewById(R.id.input_title);
         mDescriptionEditView = (TextInputEditText) rootView.findViewById(R.id.input_description);
         mDueDateEditView = (TextInputEditText) rootView.findViewById(R.id.input_due_date);
@@ -47,12 +65,17 @@ public final class CreateTaskFragment extends Fragment implements CreateTaskView
 
         Assertion.nonNull(mTitleEditView, mDescriptionEditView, mDueDateEditView, mEstimatedTimeEditView);
 
-        mPresenter = new CreateFragmentPresenter(this, new Navigator(getFragmentManager()));
+        mPresenter = new EditTaskPresenter(this, new Navigator(getFragmentManager()));
         initDialogManager();
+
+        final Optional<String> editedTaskId = Optional.ofNullable(getArguments())
+                                                      .map(bundle -> bundle.getString(TASK_ID_ARG));
+
+        editedTaskId.ifPresent(mPresenter::loadExistedTaskData);
 
         ((FloatingActionButtonOwner) getActivity())
                 .setUpFloatingButton(R.drawable.ic_fab_save,
-                        v -> mPresenter.createNewTask(getCurrentInputValues()));
+                                     v -> mPresenter.createNewTask(getCurrentInputValues(), editedTaskId));
 
         return rootView;
     }
@@ -93,13 +116,23 @@ public final class CreateTaskFragment extends Fragment implements CreateTaskView
     }
 
     @Override
+    public void setExistedTaskData(@NonNull final TaskData taskData) {
+        Assertion.nonNull(taskData);
+
+        mTitleEditView.setText(taskData.getTitle());
+        mDescriptionEditView.setText(taskData.getDescription());
+        updateDueDate(taskData.getDueDate());
+        updateEstimatedTime(taskData.getEstimatedTime());
+    }
+
+    @Override
     public void hideKeyboard() {
         KeyboardUtils.hideKeyboard(mTitleEditView);
     }
 
     @NonNull
-    private CreateTaskInputValues getCurrentInputValues() {
-        return new CreateTaskInputValues(mTitleEditView.getText().toString(),
+    private EditTaskInputValues getCurrentInputValues() {
+        return new EditTaskInputValues(mTitleEditView.getText().toString(),
                                          mDescriptionEditView.getText().toString(),
                                          DateFormatter.parse(mDueDateEditView.getText().toString()),
                                          TimeIntervalFormatter.parse(mEstimatedTimeEditView.getText().toString(),

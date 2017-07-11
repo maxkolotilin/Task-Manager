@@ -1,11 +1,13 @@
 package com.maximka.taskmanager.ui.list;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class TaskListFragment extends Fragment implements TaskListView {
+    private static final int COLUMN_COUNT_IN_LANDSCAPE = 2;
+
     private RecyclerView mTaskListRecyclerView;
     private View mEmptyView;
     private ListAdapter<TaskDataSummary> mTaskListAdapter;
@@ -61,17 +65,29 @@ public class TaskListFragment extends Fragment implements TaskListView {
     }
 
     private void initRecyclerView() {
-        final Context context = getActivity();
-
         mTaskListRecyclerView.setHasFixedSize(true);
-        mTaskListRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mTaskListAdapter = new ListAdapter.Builder<>(context,
-                                                    Collections.emptyList(),
-                                                    TaskSummaryViewHolder::new,
-                                                    () -> R.layout.task_summary_item)
-                                         .withDiffCallback(TaskListDiffCallback::new)
-                                         .build();
+        mTaskListRecyclerView.setLayoutManager(getLayoutManager());
+
+        mTaskListAdapter =
+                new ListAdapter.Builder<>(getActivity(),
+                                          Collections.emptyList(),
+                                          TaskSummaryViewHolder::new,
+                                          () -> R.layout.task_summary_item)
+
+                               .withDiffCallback(TaskListDiffCallback::new)
+                               .withItemClickListener((position, data) -> mPresenter.goToDetailsScreen(data))
+                               .build();
+
         mTaskListRecyclerView.setAdapter(mTaskListAdapter);
+    }
+
+    private RecyclerView.LayoutManager getLayoutManager() {
+        final Context context = getActivity();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            return new GridLayoutManager(context, COLUMN_COUNT_IN_LANDSCAPE);
+        } else {
+            return new LinearLayoutManager(context);
+        }
     }
 
     @Override

@@ -50,4 +50,10 @@ final class TaskListPresenter {
     public void goToCreateScreen() {
         mNavigator.navigateToCreateScreen();
     }
+
+    public void goToDetailsScreen(@NonNull final TaskDataSummary taskDataSummary) {
+        Assertion.nonNull(taskDataSummary);
+
+        mNavigator.navigateToDetailsScreen(taskDataSummary.getId());
+    }
 }
