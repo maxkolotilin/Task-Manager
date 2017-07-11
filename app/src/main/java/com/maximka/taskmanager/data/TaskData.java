@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.maximka.taskmanager.utils.Assertion;
 
 import java.util.Date;
+import java.util.UUID;
 
 public final class TaskData {
     @NonNull private String mId;
@@ -15,6 +16,17 @@ public final class TaskData {
     @NonNull private Percent mProgressPercent;
     @NonNull private TaskState mState;
     @NonNull private TimeInterval mEstimatedTime;
+
+    public TaskData(@NonNull final String title,
+                    @NonNull final String description,
+                    @NonNull final Date startDate,
+                    @NonNull final Date dueDate,
+                    @NonNull final Percent progressPercent,
+                    @NonNull final TaskState state,
+                    @NonNull final TimeInterval estimatedTime) {
+
+        this(UUID.randomUUID().toString(), title, description, startDate, dueDate, progressPercent, state, estimatedTime);
+    }
 
     public TaskData(@NonNull final String id,
                     @NonNull final String title,

@@ -1,18 +1,23 @@
 package com.maximka.taskmanager.ui.activity;
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.maximka.taskmanager.R;
+import com.maximka.taskmanager.animation.FabScaleAnimation;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 
-public class MainActivity extends AppCompatActivity implements ActivityView {
-    @NonNull private final ActivityPresenter presenter = new ActivityPresenter(this);
+public class MainActivity extends AppCompatActivity implements ActivityView, FloatingActionButtonOwner {
+    @NonNull private final ActivityPresenter mPresenter = new ActivityPresenter(this);
+    private FloatingActionButton mFloatingBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,15 +26,21 @@ public class MainActivity extends AppCompatActivity implements ActivityView {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(view ->
-//                presenter.onCreateTaskButtonClicked()
-                Navigator.navigateToCreateScreen(getSupportFragmentManager())
-        );
+        mFloatingBtn = (FloatingActionButton) findViewById(R.id.fab);
 
         if (savedInstanceState == null) {
-            Navigator.navigateToTaskListFragment(getSupportFragmentManager());
+            new Navigator(getSupportFragmentManager()).navigateToTaskListFragment();
         }
+    }
+
+    @Override
+    public void setUpFloatingButton(@DrawableRes final int iconResId, @Nullable final View.OnClickListener listener) {
+        FabScaleAnimation.applyScaleAnimation(mFloatingBtn,
+                                              getResources().getInteger(R.integer.fragment_animation_duration),
+                                              () -> {
+                                                  mFloatingBtn.setImageResource(iconResId);
+                                                  mFloatingBtn.setOnClickListener(listener);
+                                              });
     }
 
     @Override

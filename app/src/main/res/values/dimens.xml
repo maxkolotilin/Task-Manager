@@ -10,4 +10,5 @@
     <dimen name="font_size_large">18sp</dimen>
     <dimen name="font_size_extra_large">20sp</dimen>
     <dimen name="task_due_date_left_margin">6dp</dimen>
+    <dimen name="input_bottom_margin">8dp</dimen>
 </resources>

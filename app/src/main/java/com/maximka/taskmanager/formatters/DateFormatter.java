@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.maximka.taskmanager.utils.Assertion;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -15,6 +16,15 @@ public class DateFormatter {
     public static String format(@NonNull final Date date) {
         Assertion.nonNull(date);
         return sFormatter.format(date);
+    }
+
+    public static Date parse(@NonNull final String formattedDate) {
+        Assertion.nonNull(formattedDate);
+        try {
+            return sFormatter.parse(formattedDate);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     private DateFormatter() {

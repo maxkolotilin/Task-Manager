@@ -8,4 +8,10 @@
     <string name="task_state_in_progress">In Progress</string>
     <string name="task_state_done">Done</string>
     <string name="task_progress_format_string">%d%% Completed</string>
+    <string name="input_title_label">Title</string>
+    <string name="input_description_label">Description</string>
+    <string name="input_due_date_label">Due Date</string>
+    <string name="input_estimated_time_label">Estimated Time</string>
+    <string name="create_task_error_message">Blank fields are not allowed</string>
+    <string name="estimated_time_format_string">%1$dh %2$dm</string>
 </resources>

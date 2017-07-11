@@ -1,5 +1,7 @@
 package com.maximka.taskmanager.data;
 
+import com.maximka.taskmanager.utils.Assertion;
+
 import java.util.concurrent.TimeUnit;
 
 public final class TimeInterval {
@@ -9,11 +11,16 @@ public final class TimeInterval {
     private final long mTotalSeconds;
 
     public TimeInterval(final long totalSeconds) {
-        if (totalSeconds < 0) {
-            throw new IllegalArgumentException("totalSeconds must be non-negative");
-        }
+        Assertion.nonNegative(totalSeconds);
 
         mTotalSeconds = totalSeconds;
+    }
+
+    public TimeInterval(final long hours, final long minutes) {
+        Assertion.nonNegative(hours);
+        Assertion.nonNegative(minutes);
+
+        mTotalSeconds = TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes);
     }
 
     public long getHoursComponent() {

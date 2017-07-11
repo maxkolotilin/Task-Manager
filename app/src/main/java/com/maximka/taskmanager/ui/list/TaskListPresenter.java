@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Optional;
 import com.maximka.taskmanager.data.DataManager;
 import com.maximka.taskmanager.ui.list.recycler.TaskDataSummary;
+import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 
 import rx.Observable;
@@ -13,11 +14,13 @@ import rx.Subscription;
 final class TaskListPresenter {
     @NonNull private final TaskListView mView;
     @NonNull private final DataManager dataManager;
+    @NonNull private final Navigator mNavigator;
     @NonNull private Optional<Subscription> mActiveSubscription = Optional.empty();
 
-    TaskListPresenter(@NonNull final TaskListView view) {
-        Assertion.nonNull(view);
+    TaskListPresenter(@NonNull final TaskListView view, @NonNull final Navigator navigator) {
+        Assertion.nonNull(view, navigator);
         mView = view;
+        mNavigator = navigator;
         dataManager = new DataManager();
     }
 
@@ -42,5 +45,9 @@ final class TaskListPresenter {
     public void onViewDestroyed() {
         mActiveSubscription.ifPresent(Subscription::unsubscribe);
         dataManager.close();
+    }
+
+    public void goToCreateScreen() {
+        mNavigator.navigateToCreateScreen();
     }
 }

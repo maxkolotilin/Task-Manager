@@ -21,4 +21,10 @@ public class Assertion {
             }
         }
     }
+
+    public static void nonNegative(final long value) {
+        if (value < 0) {
+            throw new IllegalArgumentException("Value is negative: " + value);
+        }
+    }
 }

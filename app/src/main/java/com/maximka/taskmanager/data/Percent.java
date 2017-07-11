@@ -9,6 +9,10 @@ import com.annimon.stream.Objects;
 public final class Percent {
     private final int mPercent;
 
+    public static Percent zero() {
+        return new Percent(0);
+    }
+
     public Percent(@IntRange(from=0, to=100) final int percent) {
         if (percent < 0 || percent > 100)
         {

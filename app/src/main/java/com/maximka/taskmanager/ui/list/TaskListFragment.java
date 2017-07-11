@@ -14,9 +14,11 @@ import android.view.ViewGroup;
 
 import com.maximka.taskmanager.R;
 import com.maximka.taskmanager.recycler.adapter.ListAdapter;
+import com.maximka.taskmanager.ui.activity.FloatingActionButtonOwner;
 import com.maximka.taskmanager.ui.list.recycler.TaskDataSummary;
 import com.maximka.taskmanager.ui.list.recycler.TaskListDiffCallback;
 import com.maximka.taskmanager.ui.list.recycler.TaskSummaryViewHolder;
+import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 
 import java.util.Collections;
@@ -41,8 +43,12 @@ public class TaskListFragment extends Fragment implements TaskListView {
         mEmptyView = rootView.findViewById(R.id.empty_view);
         Assertion.nonNull(mTaskListRecyclerView, mEmptyView);
 
+        ((FloatingActionButtonOwner) getActivity())
+                .setUpFloatingButton(R.drawable.ic_fab_create,
+                                     v -> mPresenter.goToCreateScreen());
+
         initRecyclerView();
-        mPresenter = new TaskListPresenter(this);
+        mPresenter = new TaskListPresenter(this, new Navigator(getFragmentManager()));
         mPresenter.init();
 
         return rootView;
