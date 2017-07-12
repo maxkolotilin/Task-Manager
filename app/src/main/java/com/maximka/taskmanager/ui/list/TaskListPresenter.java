@@ -25,8 +25,9 @@ final class TaskListPresenter {
     }
 
     public void init() {
+        mView.showTaskListView();
         mActiveSubscription =
-                Optional.of(dataManager.getAllTasks()
+                Optional.of(dataManager.getAllTasksObservable()
                                        .flatMap(taskList -> Observable.from(taskList)
                                                                       .map(TaskDataSummary::from)
                                                                       .toList())
@@ -34,7 +35,6 @@ final class TaskListPresenter {
                                                       if (taskDataSummaries.isEmpty()) {
                                                           mView.showEmptyTaskListView();
                                                       } else {
-                                                          mView.showTaskListView();
                                                           mView.updateTaskListData(taskDataSummaries);
                                                       }
                                                   },

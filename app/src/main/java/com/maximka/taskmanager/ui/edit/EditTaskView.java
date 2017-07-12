@@ -5,7 +5,8 @@ import android.support.annotation.NonNull;
 import com.maximka.taskmanager.data.TaskData;
 
 interface EditTaskView {
-    void showErrorMessage();
+    void showInvalidInputMessage();
+    void showNotFoundErrorMessage();
     void hideKeyboard();
     void setExistedTaskData(@NonNull final TaskData taskData);
 }

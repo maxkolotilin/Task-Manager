@@ -28,33 +28,14 @@
             android:textColor="@color/text_color_primary"
             tools:text="Sample title title title title title title title title" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/task_due_date"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:layout_marginBottom="@dimen/task_item_due_date_margin_bottom"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:drawableStart="@drawable/ic_due_date"
-                android:drawableLeft="@drawable/ic_due_date"
-                android:textColor="@color/text_color_secondary"
-                android:textSize="@dimen/font_size_normal"
-                android:text="@string/due_date_label"/>
-
-            <TextView
-                android:id="@+id/task_due_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginLeft="@dimen/task_due_date_left_margin"
-                android:layout_marginStart="@dimen/task_due_date_left_margin"
-                android:textColor="@color/text_color_secondary"
-                android:textSize="@dimen/font_size_normal"
-                tools:text="very very very very long formatted beautiful date"/>
-        </LinearLayout>
+            android:textSize="@dimen/font_size_normal"
+            tools:text="very very very very long formatted beautiful date" />
 
         <RelativeLayout
             android:layout_width="match_parent"

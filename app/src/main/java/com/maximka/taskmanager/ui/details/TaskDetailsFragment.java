@@ -4,13 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.annimon.stream.Optional;
 import com.maximka.taskmanager.R;
@@ -115,7 +115,7 @@ public final class TaskDetailsFragment extends Fragment implements TaskDetailsVi
 
     @Override
     public void showErrorMessage() {
-        Snackbar.make(mTitleTextView, R.string.detail_task_load_error, Snackbar.LENGTH_LONG)
+        Toast.makeText(getActivity(), R.string.detail_task_load_error, Toast.LENGTH_LONG)
                 .show();
     }
 

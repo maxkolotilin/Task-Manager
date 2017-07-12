@@ -2,6 +2,7 @@ package com.maximka.taskmanager.data;
 
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Optional;
 import com.maximka.taskmanager.data.realm.TaskDataRealm;
 import com.maximka.taskmanager.utils.Assertion;
 
@@ -22,7 +23,7 @@ public final class DataManager {
         mRealm.close();
     }
 
-    public Observable<List<TaskData>> getAllTasks() {
+    public Observable<List<TaskData>> getAllTasksObservable() {
         return mRealm.where(TaskDataRealm.class)
                      .findAllAsync()
                      .asObservable()
@@ -39,24 +40,24 @@ public final class DataManager {
         mRealm.executeTransactionAsync(backgroundRealm -> backgroundRealm.insertOrUpdate(taskDataRealm));
     }
 
-    public Observable<TaskData> getTask(@NonNull final String id) {
+    public Optional<Observable<TaskData>> getCachedTaskDataObservable(@NonNull final String id) {
         Assertion.nonNull(id);
 
-        return mRealm.where(TaskDataRealm.class)
-                     .equalTo(TaskDataRealm.ID, id)
-                     .findFirstAsync()
-                     .asObservable()
-                     .cast(TaskDataRealm.class)
-                     .filter(taskDataRealm -> taskDataRealm.isLoaded())
-                     .map(this::mapToTaskData);
+        return Optional.ofNullable(mRealm.where(TaskDataRealm.class)
+                                         .equalTo(TaskDataRealm.ID, id)
+                                         .findFirst())
+
+                       .map(taskDataRealm -> taskDataRealm.asObservable()
+                                            .cast(TaskDataRealm.class)
+                                            .map(this::mapToTaskData));
     }
 
-    public TaskData getCachedTaskData(@NonNull final String id) {
+    public Optional<TaskData> getCachedTaskData(@NonNull final String id) {
         Assertion.nonNull(id);
 
-        return mapToTaskData(mRealm.where(TaskDataRealm.class)
-                                   .equalTo(TaskDataRealm.ID, id)
-                                   .findFirst());
+        return getCachedTaskDataObservable(id)
+                    .map(taskDataObservable -> taskDataObservable.toBlocking()
+                                                                 .first());
     }
 
     private TaskData mapToTaskData(@NonNull final TaskDataRealm taskDataRealm) {

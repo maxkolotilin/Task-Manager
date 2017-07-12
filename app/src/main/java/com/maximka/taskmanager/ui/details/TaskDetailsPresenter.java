@@ -33,13 +33,17 @@ final class TaskDetailsPresenter {
 
     public void init() {
         mTaskSubscription =
-                Optional.of(mDataManager.getTask(mTaskId)
-                                        .subscribe(taskData -> {
-                                                       mCurrentTaskData = Optional.of(taskData);
-                                                       mView.updateTaskDataViews(taskData);
-                                                   },
-                                                   throwable -> mView.showErrorMessage())
-                );
+                mDataManager.getCachedTaskDataObservable(mTaskId)
+                            .map(observable ->
+                                    observable.subscribe(taskData -> {
+                                                mCurrentTaskData = Optional.of(taskData);
+                                                mView.updateTaskDataViews(taskData);
+                                    },
+                                 throwable -> mView.showErrorMessage()))
+                             .executeIfAbsent(() -> {
+                                 mView.showErrorMessage();
+                                 mNavigator.navigateBack();
+                             });
     }
 
     public void updateTaskProgress(@NonNull final Percent progress) {

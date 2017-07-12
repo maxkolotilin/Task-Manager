@@ -38,39 +38,43 @@ final class EditTaskPresenter {
             final Date dueDate = Objects.requireNonNull(inputValues.getDueDate());
             final TimeInterval estimatedTime = Objects.requireNonNull(inputValues.getEstimatedTime());
 
-            final TaskData newTask =
-                    editedTaskId.map(mDataManager::getCachedTaskData)
-                                .map(taskData ->
-                                        new TaskData(taskData.getId(),
-                                                     title,
-                                                     description,
-                                                     taskData.getStartDate(),
-                                                     dueDate,
-                                                     taskData.getProgressPercent(),
-                                                     taskData.getState(),
-                                                     estimatedTime))
-
-                                .orElse(new TaskData(title,
-                                                     description,
-                                                     new Date(),
-                                                     dueDate,
-                                                     Percent.zero(),
-                                                     TaskState.NEW,
-                                                     estimatedTime));
-
-            mDataManager.createOrUpdateTask(newTask);
+            editedTaskId.flatMap(mDataManager::getCachedTaskData)
+                        .map(taskData ->
+                                new TaskData(taskData.getId(),
+                                             title,
+                                             description,
+                                             taskData.getStartDate(),
+                                             dueDate,
+                                             taskData.getProgressPercent(),
+                                             taskData.getState(),
+                                             estimatedTime)
+                        )
+                        .or(() -> Optional.of(new TaskData(title,
+                                                           description,
+                                                           new Date(),
+                                                           dueDate,
+                                                           Percent.zero(),
+                                                           TaskState.NEW,
+                                                           estimatedTime))
+                        )
+                        .ifPresent(mDataManager::createOrUpdateTask);
 
             mView.hideKeyboard();
             mNavigator.navigateBack();
         } else {
-            mView.showErrorMessage();
+            mView.showInvalidInputMessage();
         }
     }
 
     public void loadExistedTaskData(@NonNull final String taskId) {
         Assertion.nonNull(taskId);
 
-        mView.setExistedTaskData(mDataManager.getCachedTaskData(taskId));
+        mDataManager.getCachedTaskData(taskId)
+                    .executeIfAbsent(() -> {
+                        mView.showNotFoundErrorMessage();
+                        mNavigator.navigateBack();
+                    })
+                    .ifPresent(mView::setExistedTaskData);
     }
 
     public void onViewDestroyed() {

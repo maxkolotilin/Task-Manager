@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.annimon.stream.Optional;
 import com.maximka.taskmanager.R;
@@ -110,8 +111,14 @@ public final class EditTaskFragment extends Fragment implements EditTaskView {
     }
 
     @Override
-    public void showErrorMessage() {
-        Snackbar.make(mTitleEditView, R.string.create_task_error_message, Snackbar.LENGTH_LONG)
+    public void showInvalidInputMessage() {
+         Snackbar.make(mTitleEditView, R.string.edit_task_invalid_input_message, Snackbar.LENGTH_LONG)
+                 .show();
+    }
+
+    @Override
+    public void showNotFoundErrorMessage() {
+        Toast.makeText(getActivity(), R.string.edit_task_not_found_message, Toast.LENGTH_LONG)
                 .show();
     }
 

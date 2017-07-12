@@ -40,7 +40,8 @@ final public class TaskSummaryViewHolder extends ListAdapterViewHolder<TaskDataS
         final Date dueDate = data.getDueDate();
 
         mTitleView.setText(data.getTitle());
-        mDueDate.setText(DateFormatter.format(dueDate));
+        mDueDate.setText(resources.getString(R.string.task_item_due_date_format_string,
+                                             DateFormatter.format(dueDate)));
         mState.setText(TaskStateFormatter.format(data.getState(), context));
         mProgress.setText(ProgressPercentFormatter.format(data.getProgressPercent(), context));
 

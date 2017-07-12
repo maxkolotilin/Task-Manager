@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="task_loading_error">Couldn\'t load tasks!</string>
     <string name="task_list_empty_message">Seems that your task list is empty.</string>
-    <string name="due_date_label">Due Date:</string>
+    <string name="task_item_due_date_format_string">Due Date: %s</string>
     <string name="task_state_new">New</string>
     <string name="task_state_in_progress">In Progress</string>
     <string name="task_state_done">Done</string>
@@ -12,10 +12,11 @@
     <string name="input_description_label">Description</string>
     <string name="input_due_date_label">Due Date</string>
     <string name="input_estimated_time_label">Estimated Time</string>
-    <string name="create_task_error_message">Blank fields are not allowed</string>
+    <string name="edit_task_invalid_input_message">Blank fields are not allowed</string>
     <string name="estimated_time_format_string">%1$dh %2$dm</string>
     <string name="details_start_date_format_string">Created at %s</string>
     <string name="details_due_date_format_string">Due date: %s</string>
     <string name="details_estimated_time_format_string">Estimated Time: %s</string>
     <string name="detail_task_load_error">Could\'t load the task</string>
+    <string name="edit_task_not_found_message">Task not found</string>
 </resources>
