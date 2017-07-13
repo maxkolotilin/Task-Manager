@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import rx.Observable;
 
 public final class DataManager {
@@ -25,7 +26,7 @@ public final class DataManager {
 
     public Observable<List<TaskData>> getAllTasksObservable() {
         return mRealm.where(TaskDataRealm.class)
-                     .findAllAsync()
+                     .findAllSortedAsync(TaskDataRealm.START_DATE, Sort.DESCENDING)
                      .asObservable()
                      .filter(RealmResults::isLoaded)
                      .flatMap(taskDataRealms -> Observable.from(taskDataRealms)

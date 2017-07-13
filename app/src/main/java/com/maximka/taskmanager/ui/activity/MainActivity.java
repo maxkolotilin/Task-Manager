@@ -2,13 +2,10 @@ package com.maximka.taskmanager.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.maximka.taskmanager.R;
@@ -16,20 +13,21 @@ import com.maximka.taskmanager.animation.FabScaleAnimation;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 
 public class MainActivity extends AppCompatActivity implements ActivityView, FloatingActionButtonOwner {
-    @NonNull private final ActivityPresenter mPresenter = new ActivityPresenter(this);
+    private ActivityPresenter mPresenter;
     private FloatingActionButton mFloatingBtn;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mFloatingBtn = (FloatingActionButton) findViewById(R.id.fab);
+        mPresenter = new ActivityPresenter(this, new Navigator(getSupportFragmentManager()));
 
         if (savedInstanceState == null) {
-            new Navigator(getSupportFragmentManager()).navigateToTaskListFragment();
+            mPresenter.showTaskListScreen();
         }
     }
 
@@ -44,24 +42,8 @@ public class MainActivity extends AppCompatActivity implements ActivityView, Flo
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    public boolean onSupportNavigateUp() {
+        mPresenter.onToolbarBackPressed();
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

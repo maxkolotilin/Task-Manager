@@ -15,6 +15,7 @@ import io.realm.annotations.PrimaryKey;
 
 public class TaskDataRealm extends RealmObject {
     public static final String ID = "mId";
+    public static final String START_DATE = "mStartDate";
 
     @PrimaryKey
     @NonNull

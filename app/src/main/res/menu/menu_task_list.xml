@@ -1,0 +1,51 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.maximka.taskmanager.ui.activity.MainActivity">
+
+    <item
+        android:id="@+id/filter"
+        android:title="@string/action_filter"
+        android:icon="@drawable/ic_filter"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/filter_all"
+                    android:title="@string/filter_all"/>
+                <item
+                    android:id="@+id/filter_new"
+                    android:title="@string/filter_new" />
+                <item
+                    android:id="@+id/filter_in_progress"
+                    android:title="@string/filter_in_progress" />
+                <item
+                    android:id="@+id/filter_done"
+                    android:title="@string/filter_done" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/sort"
+        android:title="@string/action_sort"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="ifRoom">
+
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/sort_start_date"
+                        android:title="@string/sort_start_date"/>
+                    <item
+                        android:id="@+id/sort_progress"
+                        android:title="@string/sort_progress" />
+                    <item
+                        android:id="@+id/sort_due_date"
+                        android:title="@string/sort_due_date" />
+                </group>
+            </menu>
+    </item>
+
+</menu>

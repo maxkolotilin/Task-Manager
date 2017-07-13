@@ -7,16 +7,24 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.annimon.stream.Optional;
 import com.maximka.taskmanager.R;
 import com.maximka.taskmanager.recycler.adapter.ListAdapter;
 import com.maximka.taskmanager.ui.activity.FloatingActionButtonOwner;
+import com.maximka.taskmanager.ui.list.menu.FilterField;
+import com.maximka.taskmanager.ui.list.menu.SortField;
 import com.maximka.taskmanager.ui.list.recycler.TaskDataSummary;
 import com.maximka.taskmanager.ui.list.recycler.TaskListDiffCallback;
 import com.maximka.taskmanager.ui.list.recycler.TaskSummaryViewHolder;
@@ -28,6 +36,17 @@ import java.util.List;
 
 public class TaskListFragment extends Fragment implements TaskListView {
     private static final int COLUMN_COUNT_IN_LANDSCAPE = 2;
+    private static final SparseArray<FilterField> sIdToFilterField = new SparseArray<FilterField>() {{
+        put(R.id.filter_all, FilterField.ALL);
+        put(R.id.filter_new, FilterField.NEW);
+        put(R.id.filter_in_progress, FilterField.IN_PROGRESS);
+        put(R.id.filter_done, FilterField.DONE);
+    }};
+    private static final SparseArray<SortField> sIdToSortField = new SparseArray<SortField>() {{
+        put(R.id.sort_start_date, SortField.START_DATE);
+        put(R.id.sort_due_date, SortField.DUE_DATE);
+        put(R.id.sort_progress, SortField.PROGRESS);
+    }};
 
     private RecyclerView mTaskListRecyclerView;
     private View mEmptyView;
@@ -47,9 +66,15 @@ public class TaskListFragment extends Fragment implements TaskListView {
         mEmptyView = rootView.findViewById(R.id.empty_view);
         Assertion.nonNull(mTaskListRecyclerView, mEmptyView);
 
+        setHasOptionsMenu(true);
+
         ((FloatingActionButtonOwner) getActivity())
                 .setUpFloatingButton(R.drawable.ic_fab_create,
                                      v -> mPresenter.goToCreateScreen());
+
+        ((AppCompatActivity) getActivity())
+                .getSupportActionBar()
+                .setDisplayHomeAsUpEnabled(false);
 
         initRecyclerView();
         mPresenter = new TaskListPresenter(this, new Navigator(getFragmentManager()));
@@ -88,6 +113,32 @@ public class TaskListFragment extends Fragment implements TaskListView {
         } else {
             return new LinearLayoutManager(context);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_task_list, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        item.setChecked(true);
+        final int id = item.getItemId();
+
+        return Optional.ofNullable(sIdToFilterField.get(id))
+                       .map(filterField -> {
+                           mPresenter.setFilter(filterField);
+                           return true;
+                       })
+                       .or(() -> Optional.ofNullable(sIdToSortField.get(id))
+                                         .map(sortField -> {
+                                             mPresenter.setSort(sortField);
+                                             return true;
+                                         })
+                       )
+                       .orElse(false)
+
+                || super.onOptionsItemSelected(item);
     }
 
     @Override

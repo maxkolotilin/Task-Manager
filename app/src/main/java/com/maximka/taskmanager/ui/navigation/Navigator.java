@@ -50,7 +50,7 @@ public final class Navigator {
         );
     }
 
-    public void navigateToTaskListFragment() {
+    public void navigateToTaskListScreen() {
         runInFragmentTransaction(transaction ->
             transaction.add(R.id.fragment_container, TaskListFragment.newInstance(), LIST_FRAGMENT_TAG)
         );

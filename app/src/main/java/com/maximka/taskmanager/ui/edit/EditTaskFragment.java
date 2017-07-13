@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,10 @@ public final class EditTaskFragment extends Fragment implements EditTaskView {
         ((FloatingActionButtonOwner) getActivity())
                 .setUpFloatingButton(R.drawable.ic_fab_save,
                                      v -> mPresenter.createNewTask(getCurrentInputValues(), editedTaskId));
+
+        ((AppCompatActivity) getActivity())
+                .getSupportActionBar()
+                .setDisplayHomeAsUpEnabled(true);
 
         return rootView;
     }
