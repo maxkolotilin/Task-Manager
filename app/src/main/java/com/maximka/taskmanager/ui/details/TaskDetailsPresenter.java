@@ -7,67 +7,67 @@ import com.maximka.taskmanager.data.DataManager;
 import com.maximka.taskmanager.data.Percent;
 import com.maximka.taskmanager.data.TaskData;
 import com.maximka.taskmanager.data.TaskState;
+import com.maximka.taskmanager.ui.base.BasePresenter;
+import com.maximka.taskmanager.ui.data.TaskViewData;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 
 import rx.Subscription;
 
-final class TaskDetailsPresenter {
-    @NonNull private final TaskDetailsView mView;
+final class TaskDetailsPresenter extends BasePresenter<TaskDetailsView> {
+    @NonNull private final DataManager mDataManager = new DataManager();
     @NonNull private final Navigator mNavigator;
-    @NonNull private final DataManager mDataManager;
     @NonNull private final String mTaskId;
-    @NonNull private Optional<TaskData> mCurrentTaskData = Optional.empty();
-    @NonNull private Optional<Subscription> mTaskSubscription = Optional.empty();
 
-    public TaskDetailsPresenter(@NonNull final TaskDetailsView view,
-                                @NonNull final Navigator navigator,
-                                @NonNull final String taskId) {
-        Assertion.nonNull(view, navigator, taskId);
+    TaskDetailsPresenter(@NonNull final TaskDetailsView view,
+                         @NonNull final Navigator navigator,
+                         @NonNull final String taskId) {
+        super(view);
+        Assertion.nonNull(navigator, taskId);
 
-        mView = view;
         mNavigator = navigator;
         mTaskId = taskId;
-        mDataManager = new DataManager();
     }
 
+    @Override
     public void init() {
-        mTaskSubscription =
-                mDataManager.getCachedTaskDataObservable(mTaskId)
-                            .map(observable ->
-                                    observable.subscribe(taskData -> {
-                                                mCurrentTaskData = Optional.of(taskData);
-                                                mView.updateTaskDataViews(taskData);
-                                    },
-                                 throwable -> mView.showErrorMessage()))
-                             .executeIfAbsent(() -> {
-                                 mView.showErrorMessage();
-                                 mNavigator.navigateBack();
-                             });
+        addSubscription(subscribeOnCachedTask());
     }
 
-    public void updateTaskProgress(@NonNull final Percent progress) {
+    private Optional<Subscription> subscribeOnCachedTask() {
+        return mDataManager
+                .getCachedTaskDataObservable(mTaskId)
+                .map(observable ->
+                        observable.map(TaskViewData::from)
+                                  .subscribe(
+                                          viewData ->
+                                                  runWithView(v -> v.updateTaskDataViews(viewData)),
+                                          throwable ->
+                                                  runWithView(TaskDetailsView::showErrorMessage)
+                                )
+                )
+                .executeIfAbsent(() -> {
+                        runWithView(TaskDetailsView::showErrorMessage);
+                        mNavigator.navigateBack();
+                });
+    }
+
+    void updateTaskProgress(@NonNull final Percent progress) {
         Assertion.nonNull(progress);
 
-        mCurrentTaskData.ifPresent(taskData -> {
-            final TaskState state = progress.isAtMax() ? TaskState.DONE : TaskState.IN_PROGRESS;
-            mDataManager.createOrUpdateTask(new TaskData(taskData.getId(),
-                                                         taskData.getTitle(),
-                                                         taskData.getDescription(),
-                                                         taskData.getStartDate(),
-                                                         taskData.getDueDate(),
-                                                         progress,
-                                                         state,
-                                                         taskData.getEstimatedTime()));
-        });
+        mDataManager.getCachedTaskData(mTaskId)
+                    .ifPresent(taskData -> {
+                            final TaskState state =
+                                    progress.isAtMax() ? TaskState.DONE : TaskState.IN_PROGRESS;
+
+                            mDataManager.createOrUpdateTask(TaskData.newBuilder(taskData)
+                                                                    .withState(state)
+                                                                    .withProgressPercent(progress)
+                                                                    .build());
+                    });
     }
 
-    public void onEditButtonClicked() {
+    void onEditButtonClicked() {
         mNavigator.navigateToEditScreen(mTaskId);
-    }
-
-    public void onViewDestroyed() {
-        mTaskSubscription.ifPresent(Subscription::unsubscribe);
-        mDataManager.close();
     }
 }

@@ -16,11 +16,11 @@ final class ActivityPresenter {
         mNavigator = navigator;
     }
 
-    public void showTaskListScreen() {
+    void showTaskListScreen() {
         mNavigator.navigateToTaskListScreen();
     }
 
-    public void onToolbarBackPressed() {
+    void onToolbarBackPressed() {
         mNavigator.navigateBack();
     }
 }

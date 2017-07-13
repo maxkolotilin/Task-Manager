@@ -4,121 +4,101 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Optional;
 import com.maximka.taskmanager.data.DataManager;
-import com.maximka.taskmanager.data.TaskData;
-import com.maximka.taskmanager.data.TaskState;
-import com.maximka.taskmanager.ui.list.menu.FilterField;
+import com.maximka.taskmanager.preferences.Preferences;
+import com.maximka.taskmanager.ui.base.BasePresenter;
+import com.maximka.taskmanager.ui.list.menu.StateFilter;
 import com.maximka.taskmanager.ui.list.menu.SortField;
-import com.maximka.taskmanager.ui.list.recycler.TaskDataSummary;
+import com.maximka.taskmanager.ui.data.TaskSummaryViewData;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.Map;
-
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Func1;
-import rx.functions.Func2;
 
-final class TaskListPresenter {
-    private static final Map<FilterField, Func1<TaskData, Boolean>> sFilterMap =
-            new EnumMap<FilterField, Func1<TaskData, Boolean>>(FilterField.class) {{
-                put(FilterField.ALL, taskData -> true);
-                put(FilterField.NEW, taskData -> taskData.getState() == TaskState.NEW);
-                put(FilterField.IN_PROGRESS, taskData -> taskData.getState() == TaskState.IN_PROGRESS);
-                put(FilterField.DONE, taskData -> taskData.getState() == TaskState.DONE);
-            }};
-
-    private static final Map<SortField, Func2<TaskData, TaskData, Integer>> sComparatorMap =
-            new EnumMap<SortField, Func2<TaskData, TaskData, Integer>>(SortField.class) {{
-                put(SortField.START_DATE,
-                        (first, second) -> compareDatesDesc(first.getStartDate(), second.getStartDate()));
-
-                put(SortField.DUE_DATE,
-                        (first, second) -> compareDatesAsc(first.getDueDate(), second.getDueDate()));
-
-                put(SortField.PROGRESS,
-                        (first, second) -> first.getProgressPercent().asInt() - second.getProgressPercent().asInt());
-            }};
-
-    private static int compareDatesAsc(@NonNull final Date first, @NonNull final Date second) {
-        Assertion.nonNull(first, second);
-        return (int)(first.getTime() - second.getTime());
-    }
-
-    private static int compareDatesDesc(@NonNull final Date first, @NonNull final Date second) {
-        Assertion.nonNull(first, second);
-        return compareDatesAsc(second, first);
-    }
-
-    @NonNull private final TaskListView mView;
-    @NonNull private final DataManager dataManager;
+final class TaskListPresenter extends BasePresenter<TaskListView> {
+    @NonNull private final DataManager mDataManager = new DataManager();
     @NonNull private final Navigator mNavigator;
-    @NonNull private Optional<Subscription> mActiveSubscription = Optional.empty();
-    @NonNull private Func1<TaskData, Boolean> mFilter = sFilterMap.get(FilterField.ALL);
-    @NonNull private Func2<TaskData, TaskData, Integer> mComparator = sComparatorMap.get(SortField.START_DATE);
+    @NonNull private final Preferences mPreferences;
+    @NonNull private Optional<Subscription> mTaskListSubscription = Optional.empty();
 
-    TaskListPresenter(@NonNull final TaskListView view, @NonNull final Navigator navigator) {
-        Assertion.nonNull(view, navigator);
-        mView = view;
+    TaskListPresenter(@NonNull final TaskListView view,
+                      @NonNull final Navigator navigator,
+                      @NonNull final Preferences preferences) {
+        super(view);
+        Assertion.nonNull(navigator, preferences);
+
         mNavigator = navigator;
-        dataManager = new DataManager();
+        mPreferences = preferences;
     }
 
+    @Override
     public void init() {
-        mView.showTaskListView();
-        mActiveSubscription =
-                Optional.of(dataManager.getAllTasksObservable()
-                                       .flatMap(taskList -> Observable.from(taskList)
-                                                                      .filter(mFilter)
-                                                                      .sorted(mComparator)
-                                                                      .map(TaskDataSummary::from)
-                                                                      .toList())
-                                       .subscribe(taskDataSummaries -> {
-                                                      if (taskDataSummaries.isEmpty()) {
-                                                          mView.showEmptyTaskListView();
-                                                      } else {
-                                                          mView.updateTaskListData(taskDataSummaries);
-                                                      }
-                                                  },
-                                                  throwable -> mView.showErrorMessage())
+        subscribeToTaskList();
+    }
+
+    @Override
+    protected void onViewDestroyed() {
+        mTaskListSubscription.ifPresent(Subscription::unsubscribe);
+        super.onViewDestroyed();
+    }
+
+    private void subscribeToTaskList() {
+        mTaskListSubscription =
+                Optional.of(
+                        mDataManager.getAllTasksObservable()
+                                    .flatMap(taskList ->
+                                            Observable.from(taskList)
+                                                      .filter(mPreferences.getStateFilter()
+                                                                          .getFilter())
+                                                      .sorted(mPreferences.getSortField()
+                                                                          .getComparator())
+                                                      .map(TaskSummaryViewData::from)
+                                                      .toList()
+                                    )
+                                    .subscribe(taskDataSummaries -> {
+                                                   if (taskDataSummaries.isEmpty()) {
+                                                       runWithView(TaskListView::showEmptyTaskListView);
+                                                   } else {
+                                                       runWithView(view -> {
+                                                           view.showTaskListView();
+                                                           view.updateTaskListData(taskDataSummaries);
+                                                       });
+                                                   }
+                                               },
+                                               throwable -> {
+                                                   throwable.printStackTrace();
+                                                   runWithView(TaskListView::showErrorMessage);
+                                               }
+                                    )
                 );
     }
 
-    public void onViewDestroyed() {
-        mActiveSubscription.ifPresent(Subscription::unsubscribe);
-        dataManager.close();
-    }
-
-    public void goToCreateScreen() {
+    void goToCreateScreen() {
         mNavigator.navigateToCreateScreen();
     }
 
-    public void goToDetailsScreen(@NonNull final TaskDataSummary taskDataSummary) {
+    void goToDetailsScreen(@NonNull final TaskSummaryViewData taskDataSummary) {
         Assertion.nonNull(taskDataSummary);
 
         mNavigator.navigateToDetailsScreen(taskDataSummary.getId());
     }
 
-    public void setFilter(@NonNull final FilterField filterField) {
-        Assertion.nonNull(filterField);
-        mFilter = sFilterMap.get(filterField);
-        Assertion.nonNull(mFilter);
+    void setStateFilter(@NonNull final StateFilter stateFilter) {
+        Assertion.nonNull(stateFilter);
 
-        reinit();
+        mPreferences.setStateFilter(stateFilter);
+        resubscribe();
     }
 
-    public void setSort(@NonNull final SortField sortField) {
+    void setSortField(@NonNull final SortField sortField) {
         Assertion.nonNull(sortField);
-        mComparator = sComparatorMap.get(sortField);
-        Assertion.nonNull(mComparator);
 
-        reinit();
+        mPreferences.setSortField(sortField);
+        resubscribe();
     }
 
-    private void reinit() {
-        mActiveSubscription.ifPresent(Subscription::unsubscribe);
-        init();
+    private void resubscribe() {
+        mTaskListSubscription.ifPresent(Subscription::unsubscribe);
+        subscribeToTaskList();
     }
 }

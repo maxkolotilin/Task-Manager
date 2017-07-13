@@ -3,22 +3,20 @@ package com.maximka.taskmanager.ui.edit;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.annimon.stream.Optional;
 import com.maximka.taskmanager.R;
-import com.maximka.taskmanager.data.TaskData;
 import com.maximka.taskmanager.data.TimeInterval;
 import com.maximka.taskmanager.formatters.DateFormatter;
 import com.maximka.taskmanager.formatters.TimeIntervalFormatter;
-import com.maximka.taskmanager.ui.activity.FloatingActionButtonOwner;
+import com.maximka.taskmanager.ui.base.BaseFragment;
+import com.maximka.taskmanager.ui.data.EditTaskInputDataSaver;
+import com.maximka.taskmanager.ui.data.EditTaskInputValues;
+import com.maximka.taskmanager.ui.data.TaskViewData;
 import com.maximka.taskmanager.ui.navigation.DialogManager;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
@@ -26,40 +24,70 @@ import com.maximka.taskmanager.utils.KeyboardUtils;
 
 import java.util.Date;
 
-public final class EditTaskFragment extends Fragment implements EditTaskView {
+public final class EditTaskFragment extends BaseFragment<EditTaskPresenter> implements EditTaskView {
     private static final String TASK_ID_ARG = "taskId";
 
     private TextInputEditText mTitleEditView;
     private TextInputEditText mDescriptionEditView;
     private TextInputEditText mDueDateEditView;
     private TextInputEditText mEstimatedTimeEditView;
-    private EditTaskPresenter mPresenter;
     private DialogManager mDialogManager;
+    private EditTaskInputDataSaver mInputDataSaver;
 
-    // Used for create new task
-    public static EditTaskFragment newInstance() {
+    public static EditTaskFragment newCreateTaskInstance() {
         return new EditTaskFragment();
     }
 
-    // Used for update existing task
-    public static EditTaskFragment newInstance(@NonNull final String taskId) {
+    public static EditTaskFragment newEditTaskInstance(@NonNull final String taskId) {
         Assertion.nonNull(taskId);
 
         final Bundle arguments = new Bundle();
         arguments.putString(TASK_ID_ARG, taskId);
 
-        final EditTaskFragment fragment = newInstance();
+        final EditTaskFragment fragment = new EditTaskFragment();
         fragment.setArguments(arguments);
 
         return fragment;
     }
 
-    @Nullable
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.task_edit_fragment;
+    }
+
+    @Override
+    protected int getFloatingButtonIcon() {
+        return R.drawable.ic_fab_save;
+    }
+
+    @Override
+    protected View.OnClickListener getOnFloatingButtonClickListener() {
+        return v -> getPresenter().createNewTask(getCurrentInputValues(), getStringArgument(TASK_ID_ARG));
+    }
+
+    @Override
+    protected boolean showToolbarBackArrow() {
+        return true;
+    }
+
+    @NonNull
+    @Override
+    protected EditTaskPresenter createPresenter() {
+        return new EditTaskPresenter(this, new Navigator(getFragmentManager()));
+    }
+
+    @Override
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mInputDataSaver = EditTaskInputDataSaver.from(savedInstanceState);
+    }
+
+    @NonNull
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.task_edit_fragment, container, false);
+        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
         mTitleEditView = (TextInputEditText) rootView.findViewById(R.id.input_title);
         mDescriptionEditView = (TextInputEditText) rootView.findViewById(R.id.input_description);
         mDueDateEditView = (TextInputEditText) rootView.findViewById(R.id.input_due_date);
@@ -67,23 +95,19 @@ public final class EditTaskFragment extends Fragment implements EditTaskView {
 
         Assertion.nonNull(mTitleEditView, mDescriptionEditView, mDueDateEditView, mEstimatedTimeEditView);
 
-        mPresenter = new EditTaskPresenter(this, new Navigator(getFragmentManager()));
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         initDialogManager();
 
-        final Optional<String> editedTaskId = Optional.ofNullable(getArguments())
-                                                      .map(bundle -> bundle.getString(TASK_ID_ARG));
-
-        editedTaskId.ifPresent(mPresenter::loadExistedTaskData);
-
-        ((FloatingActionButtonOwner) getActivity())
-                .setUpFloatingButton(R.drawable.ic_fab_save,
-                                     v -> mPresenter.createNewTask(getCurrentInputValues(), editedTaskId));
-
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setDisplayHomeAsUpEnabled(true);
-
-        return rootView;
+        Optional.ofNullable(savedInstanceState)
+                .executeIfAbsent(() ->
+                        getStringArgument(TASK_ID_ARG).ifPresent(getPresenter()::loadExistedTaskData)
+                );
     }
 
     private void initDialogManager() {
@@ -101,34 +125,40 @@ public final class EditTaskFragment extends Fragment implements EditTaskView {
 
     private void updateDueDate(@NonNull final Date dueDate) {
         Assertion.nonNull(dueDate);
+
         mDueDateEditView.setText(DateFormatter.format(dueDate));
+        mInputDataSaver = EditTaskInputDataSaver.newBuilder(mInputDataSaver)
+                                                .withDueDate(dueDate)
+                                                .build();
     }
 
     private void updateEstimatedTime(@NonNull final TimeInterval estimatedTime) {
         Assertion.nonNull(estimatedTime);
+
         mEstimatedTimeEditView.setText(TimeIntervalFormatter.format(estimatedTime, getActivity()));
+        mInputDataSaver = EditTaskInputDataSaver.newBuilder(mInputDataSaver)
+                                                .withEstimatedTime(estimatedTime)
+                                                .build();
     }
 
     @Override
-    public void onDestroyView() {
-        mPresenter.onViewDestroyed();
-        super.onDestroyView();
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mInputDataSaver.save(outState);
     }
 
     @Override
     public void showInvalidInputMessage() {
-         Snackbar.make(mTitleEditView, R.string.edit_task_invalid_input_message, Snackbar.LENGTH_LONG)
-                 .show();
+        showSnack(R.string.edit_task_invalid_input_message);
     }
 
     @Override
     public void showNotFoundErrorMessage() {
-        Toast.makeText(getActivity(), R.string.edit_task_not_found_message, Toast.LENGTH_LONG)
-                .show();
+        showToast(R.string.edit_task_not_found_message);
     }
 
     @Override
-    public void setExistedTaskData(@NonNull final TaskData taskData) {
+    public void setExistedTaskData(@NonNull final TaskViewData taskData) {
         Assertion.nonNull(taskData);
 
         mTitleEditView.setText(taskData.getTitle());
@@ -145,9 +175,8 @@ public final class EditTaskFragment extends Fragment implements EditTaskView {
     @NonNull
     private EditTaskInputValues getCurrentInputValues() {
         return new EditTaskInputValues(mTitleEditView.getText().toString(),
-                                         mDescriptionEditView.getText().toString(),
-                                         DateFormatter.parse(mDueDateEditView.getText().toString()),
-                                         TimeIntervalFormatter.parse(mEstimatedTimeEditView.getText().toString(),
-                                                                     getActivity()));
+                                       mDescriptionEditView.getText().toString(),
+                                       mInputDataSaver.getDueDate(),
+                                       mInputDataSaver.getEstimatedTime());
     }
 }

@@ -8,7 +8,7 @@ public enum TaskState {
 
     private final int mState;
 
-    TaskState(int state) {
+    TaskState(final int state) {
         mState = state;
     }
 

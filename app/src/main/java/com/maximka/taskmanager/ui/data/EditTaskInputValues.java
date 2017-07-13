@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.edit;
+package com.maximka.taskmanager.ui.data;
 
 import android.support.annotation.Nullable;
 
@@ -7,7 +7,7 @@ import com.maximka.taskmanager.utils.StringUtils;
 
 import java.util.Date;
 
-final class EditTaskInputValues {
+public final class EditTaskInputValues {
     @Nullable private final String mTitle;
     @Nullable private final String mDescription;
     @Nullable private final Date mDueDate;

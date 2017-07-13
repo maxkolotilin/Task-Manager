@@ -29,7 +29,7 @@ public final class Navigator {
     public void navigateToCreateScreen()
     {
         runInFragmentTransaction(
-                getBackableTransactionBody(EditTaskFragment.newInstance(), CREATE_FRAGMENT_TAG)
+                getBackableTransactionBody(EditTaskFragment.newCreateTaskInstance(), CREATE_FRAGMENT_TAG)
         );
     }
 
@@ -46,7 +46,7 @@ public final class Navigator {
         Assertion.nonNull(taskId);
 
         runInFragmentTransaction(
-                getBackableTransactionBody(EditTaskFragment.newInstance(taskId), EDIT_FRAGMENT_TAG)
+                getBackableTransactionBody(EditTaskFragment.newEditTaskInstance(taskId), EDIT_FRAGMENT_TAG)
         );
     }
 

@@ -10,12 +10,10 @@ import com.maximka.taskmanager.R;
 import com.maximka.taskmanager.formatters.ProgressPercentFormatter;
 import com.maximka.taskmanager.formatters.TaskStateFormatter;
 import com.maximka.taskmanager.recycler.adapter.ListAdapterViewHolder;
+import com.maximka.taskmanager.ui.data.TaskSummaryViewData;
 import com.maximka.taskmanager.utils.Assertion;
-import com.maximka.taskmanager.formatters.DateFormatter;
 
-import java.util.Date;
-
-final public class TaskSummaryViewHolder extends ListAdapterViewHolder<TaskDataSummary> {
+public final class TaskSummaryViewHolder extends ListAdapterViewHolder<TaskSummaryViewData> {
     @NonNull private final TextView mTitleView;
     @NonNull private final TextView mDueDate;
     @NonNull private final TextView mState;
@@ -32,20 +30,17 @@ final public class TaskSummaryViewHolder extends ListAdapterViewHolder<TaskDataS
     }
 
     @Override
-    public void bind(@NonNull final TaskDataSummary data) {
+    public void bind(@NonNull final TaskSummaryViewData data) {
         Assertion.nonNull(data);
 
         final Context context = itemView.getContext();
         final Resources resources = context.getResources();
-        final Date dueDate = data.getDueDate();
 
         mTitleView.setText(data.getTitle());
         mDueDate.setText(resources.getString(R.string.task_item_due_date_format_string,
-                                             DateFormatter.format(dueDate)));
+                                             data.getDueDate()));
         mState.setText(TaskStateFormatter.format(data.getState(), context));
         mProgress.setText(ProgressPercentFormatter.format(data.getProgressPercent(), context));
-
-        final int colorResId = dueDate.before(new Date()) ? R.color.text_color_warning : R.color.text_color_secondary;
-        mDueDate.setTextColor(resources.getColor(colorResId));
+        mDueDate.setTextColor(resources.getColor(data.getDueDateColor()));
     }
 }

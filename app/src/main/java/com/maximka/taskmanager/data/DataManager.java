@@ -14,43 +14,46 @@ import io.realm.Sort;
 import rx.Observable;
 
 public final class DataManager {
-    @NonNull private final Realm mRealm;
-
-    public DataManager() {
-        mRealm = Realm.getDefaultInstance();
-    }
-
-    public void close() {
-        mRealm.close();
-    }
 
     public Observable<List<TaskData>> getAllTasksObservable() {
-        return mRealm.where(TaskDataRealm.class)
-                     .findAllSortedAsync(TaskDataRealm.START_DATE, Sort.DESCENDING)
-                     .asObservable()
-                     .filter(RealmResults::isLoaded)
-                     .flatMap(taskDataRealms -> Observable.from(taskDataRealms)
-                                                          .map(this::mapToTaskData)
-                                                          .toList());
+        final Realm realm = Realm.getDefaultInstance();
+
+        return realm.where(TaskDataRealm.class)
+                    .findAllSortedAsync(TaskDataRealm.START_DATE, Sort.DESCENDING)
+                    .asObservable()
+                    .filter(RealmResults::isLoaded)
+                    .flatMap(taskDataRealms -> Observable.from(taskDataRealms)
+                                                         .map(this::mapToTaskData)
+                                                         .toList()
+                    )
+                    .doOnUnsubscribe(realm::close);
     }
 
     public void createOrUpdateTask(@NonNull final TaskData taskData) {
         Assertion.nonNull(taskData);
 
-        final TaskDataRealm taskDataRealm = mapToTaskDataRealm(taskData);
-        mRealm.executeTransactionAsync(backgroundRealm -> backgroundRealm.insertOrUpdate(taskDataRealm));
+        final Realm realm = Realm.getDefaultInstance();
+        try {
+            realm.executeTransactionAsync(backgroundRealm ->
+                    backgroundRealm.insertOrUpdate(mapToTaskDataRealm(taskData))
+            );
+        } finally {
+            realm.close();
+        }
     }
 
     public Optional<Observable<TaskData>> getCachedTaskDataObservable(@NonNull final String id) {
         Assertion.nonNull(id);
 
-        return Optional.ofNullable(mRealm.where(TaskDataRealm.class)
-                                         .equalTo(TaskDataRealm.ID, id)
-                                         .findFirst())
+        final Realm realm = Realm.getDefaultInstance();
+        return Optional.ofNullable(realm.where(TaskDataRealm.class)
+                                        .equalTo(TaskDataRealm.ID, id)
+                                        .findFirst())
 
                        .map(taskDataRealm -> taskDataRealm.asObservable()
-                                            .cast(TaskDataRealm.class)
-                                            .map(this::mapToTaskData));
+                                                          .cast(TaskDataRealm.class)
+                                                          .map(this::mapToTaskData)
+                                                          .doOnUnsubscribe(realm::close));
     }
 
     public Optional<TaskData> getCachedTaskData(@NonNull final String id) {
@@ -64,14 +67,16 @@ public final class DataManager {
     private TaskData mapToTaskData(@NonNull final TaskDataRealm taskDataRealm) {
         Assertion.nonNull(taskDataRealm);
 
-        return new TaskData(taskDataRealm.getId(),
-                            taskDataRealm.getTitle(),
-                            taskDataRealm.getDescription(),
-                            taskDataRealm.getStartDate(),
-                            taskDataRealm.getDueDate(),
-                            taskDataRealm.getProgressPercent(),
-                            taskDataRealm.getState(),
-                            taskDataRealm.getEstimatedTime());
+        return TaskData.newBuilder()
+                       .withId(taskDataRealm.getId())
+                       .withTitle(taskDataRealm.getTitle())
+                       .withDescription(taskDataRealm.getDescription())
+                       .withStartDate(taskDataRealm.getStartDate())
+                       .withDueDate(taskDataRealm.getDueDate())
+                       .withState(taskDataRealm.getState())
+                       .withProgressPercent(taskDataRealm.getProgressPercent())
+                       .withEstimatedTime(taskDataRealm.getEstimatedTime())
+                       .build();
     }
 
     private TaskDataRealm mapToTaskDataRealm(@NonNull final TaskData taskData) {

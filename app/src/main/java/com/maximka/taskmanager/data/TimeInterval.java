@@ -2,9 +2,10 @@ package com.maximka.taskmanager.data;
 
 import com.maximka.taskmanager.utils.Assertion;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-public final class TimeInterval {
+public final class TimeInterval implements Serializable {
     private static final int MINUTES_IN_HOUR = 60;
 
     private final long mTotalSeconds;

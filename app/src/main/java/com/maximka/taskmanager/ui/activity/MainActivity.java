@@ -11,8 +11,9 @@ import android.view.View;
 import com.maximka.taskmanager.R;
 import com.maximka.taskmanager.animation.FabScaleAnimation;
 import com.maximka.taskmanager.ui.navigation.Navigator;
+import com.maximka.taskmanager.utils.Assertion;
 
-public class MainActivity extends AppCompatActivity implements ActivityView, FloatingActionButtonOwner {
+public final class MainActivity extends AppCompatActivity implements ActivityView, FloatingActionButtonOwner {
     private ActivityPresenter mPresenter;
     private FloatingActionButton mFloatingBtn;
 
@@ -24,8 +25,10 @@ public class MainActivity extends AppCompatActivity implements ActivityView, Flo
         setSupportActionBar(toolbar);
 
         mFloatingBtn = (FloatingActionButton) findViewById(R.id.fab);
-        mPresenter = new ActivityPresenter(this, new Navigator(getSupportFragmentManager()));
 
+        Assertion.nonNull(mFloatingBtn);
+
+        mPresenter = new ActivityPresenter(this, new Navigator(getSupportFragmentManager()));
         if (savedInstanceState == null) {
             mPresenter.showTaskListScreen();
         }

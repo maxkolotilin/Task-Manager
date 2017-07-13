@@ -2,9 +2,10 @@ package com.maximka.taskmanager.ui.details;
 
 import android.support.annotation.NonNull;
 
-import com.maximka.taskmanager.data.TaskData;
+import com.maximka.taskmanager.ui.base.BaseView;
+import com.maximka.taskmanager.ui.data.TaskViewData;
 
-interface TaskDetailsView {
+interface TaskDetailsView extends BaseView {
     void showErrorMessage();
-    void updateTaskDataViews(@NonNull final TaskData taskData);
+    void updateTaskDataViews(@NonNull final TaskViewData taskData);
 }

@@ -9,6 +9,7 @@ import com.maximka.taskmanager.utils.Assertion;
 
 public class ProgressPercentFormatter {
 
+    @NonNull
     public static String format(@NonNull final Percent percent, @NonNull final Context context) {
         Assertion.nonNull(percent, context);
 

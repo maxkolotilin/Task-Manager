@@ -4,28 +4,23 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.annimon.stream.Optional;
 import com.maximka.taskmanager.R;
 import com.maximka.taskmanager.data.Percent;
-import com.maximka.taskmanager.data.TaskData;
-import com.maximka.taskmanager.formatters.DateFormatter;
 import com.maximka.taskmanager.formatters.ProgressPercentFormatter;
 import com.maximka.taskmanager.formatters.TaskStateFormatter;
 import com.maximka.taskmanager.formatters.TimeIntervalFormatter;
-import com.maximka.taskmanager.ui.activity.FloatingActionButtonOwner;
+import com.maximka.taskmanager.ui.base.BaseFragment;
+import com.maximka.taskmanager.ui.data.TaskViewData;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 
-public final class TaskDetailsFragment extends Fragment implements TaskDetailsView {
+public final class TaskDetailsFragment extends BaseFragment<TaskDetailsPresenter> implements TaskDetailsView {
     private static final String TASK_ID_ARG = "taskId";
 
     private TextView mTitleTextView;
@@ -36,7 +31,6 @@ public final class TaskDetailsFragment extends Fragment implements TaskDetailsVi
     private TextView mStateTextView;
     private TextView mProgressTextView;
     private SeekBar mProgressSeekBar;
-    private TaskDetailsPresenter mPresenter;
 
     public static TaskDetailsFragment newInstance(@NonNull final String taskId) {
         Assertion.nonNull(taskId);
@@ -50,13 +44,41 @@ public final class TaskDetailsFragment extends Fragment implements TaskDetailsVi
         return fragment;
     }
 
-    @Nullable
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.task_details_fragment;
+    }
+
+    @Override
+    protected int getFloatingButtonIcon() {
+        return R.drawable.ic_fab_edit;
+    }
+
+    @Override
+    protected View.OnClickListener getOnFloatingButtonClickListener() {
+        return v -> getPresenter().onEditButtonClicked();
+    }
+
+    @Override
+    protected boolean showToolbarBackArrow() {
+        return true;
+    }
+
+    @NonNull
+    @Override
+    protected TaskDetailsPresenter createPresenter() {
+        return new TaskDetailsPresenter(this,
+                                        new Navigator(getFragmentManager()),
+                                        getStringArgument(TASK_ID_ARG).orElseThrow(IllegalArgumentException::new));
+    }
+
+    @NonNull
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater,
                              @Nullable final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
 
-        final View rootView = inflater.inflate(R.layout.task_details_fragment, container, false);
+        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
         mTitleTextView = (TextView) rootView.findViewById(R.id.title);
         mDescriptionTextView = (TextView) rootView.findViewById(R.id.description);
         mStartDateTextView = (TextView) rootView.findViewById(R.id.start_date);
@@ -75,17 +97,12 @@ public final class TaskDetailsFragment extends Fragment implements TaskDetailsVi
                           mProgressSeekBar,
                           mProgressTextView);
 
-        final String taskId = getTaskIdFromArguments();
-        mPresenter = new TaskDetailsPresenter(this, new Navigator(getFragmentManager()), taskId);
-        mPresenter.init();
+        return rootView;
+    }
 
-        ((FloatingActionButtonOwner) getActivity())
-                .setUpFloatingButton(R.drawable.ic_fab_edit,
-                                     v -> mPresenter.onEditButtonClicked());
-
-        ((AppCompatActivity) getActivity())
-                .getSupportActionBar()
-                .setDisplayHomeAsUpEnabled(true);
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -98,47 +115,31 @@ public final class TaskDetailsFragment extends Fragment implements TaskDetailsVi
 
             @Override
             public void onStopTrackingTouch(@NonNull final SeekBar seekBar) {
-                mPresenter.updateTaskProgress(new Percent(seekBar.getProgress()));
+                getPresenter().updateTaskProgress(new Percent(seekBar.getProgress()));
             }
         });
-
-        return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        mPresenter.onViewDestroyed();
-        super.onDestroyView();
-    }
-
-    @NonNull
-    private String getTaskIdFromArguments() {
-        return Optional.ofNullable(getArguments())
-                       .map(bundle -> bundle.getString(TASK_ID_ARG))
-                       .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
     public void showErrorMessage() {
-        Toast.makeText(getActivity(), R.string.detail_task_load_error, Toast.LENGTH_LONG)
-                .show();
+        showToast(R.string.detail_task_load_error);
     }
 
     @Override
-    public void updateTaskDataViews(@NonNull final TaskData taskData) {
+    public void updateTaskDataViews(@NonNull final TaskViewData taskData) {
         Assertion.nonNull(taskData);
 
         final Context context = getActivity();
-        final Percent progress = taskData.getProgressPercent();
+        final Percent progress = taskData.getProgress();
 
         mTitleTextView.setText(taskData.getTitle());
         mDescriptionTextView.setText(taskData.getDescription());
 
         mStartDateTextView.setText(getString(R.string.details_start_date_format_string,
-                                             DateFormatter.format(taskData.getStartDate())));
+                                             taskData.getFormattedStartDate()));
 
         mDueDateTextView.setText(getString(R.string.details_due_date_format_string,
-                                           DateFormatter.format(taskData.getDueDate())));
+                                           taskData.getFormattedDueDate()));
 
         mEstimatedTimeTextView.setText(getString(R.string.details_estimated_time_format_string,
                                                  TimeIntervalFormatter.format(taskData.getEstimatedTime(),
