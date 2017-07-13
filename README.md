@@ -3,6 +3,7 @@ This is mobile task manager where user can create, view and change task completi
 
 ## Features
 - displaying list of tasks
+- sorting and filtering
 - task creation
 - task editing
 - all task are stored in local db
