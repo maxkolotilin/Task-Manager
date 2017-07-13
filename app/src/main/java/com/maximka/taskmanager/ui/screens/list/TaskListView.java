@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.list;
+package com.maximka.taskmanager.ui.screens.list;
 
 import android.support.annotation.NonNull;
 

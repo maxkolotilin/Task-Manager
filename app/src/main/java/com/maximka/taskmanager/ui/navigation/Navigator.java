@@ -7,9 +7,9 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.annimon.stream.function.Consumer;
 import com.maximka.taskmanager.R;
-import com.maximka.taskmanager.ui.edit.EditTaskFragment;
-import com.maximka.taskmanager.ui.details.TaskDetailsFragment;
-import com.maximka.taskmanager.ui.list.TaskListFragment;
+import com.maximka.taskmanager.ui.screens.edit.EditTaskFragment;
+import com.maximka.taskmanager.ui.screens.details.TaskDetailsFragment;
+import com.maximka.taskmanager.ui.screens.list.TaskListFragment;
 import com.maximka.taskmanager.utils.Assertion;
 
 public final class Navigator {

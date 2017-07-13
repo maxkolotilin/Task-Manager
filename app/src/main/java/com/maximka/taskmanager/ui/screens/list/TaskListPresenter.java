@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.list;
+package com.maximka.taskmanager.ui.screens.list;
 
 import android.support.annotation.NonNull;
 
@@ -6,8 +6,8 @@ import com.annimon.stream.Optional;
 import com.maximka.taskmanager.data.DataManager;
 import com.maximka.taskmanager.preferences.Preferences;
 import com.maximka.taskmanager.ui.base.BasePresenter;
-import com.maximka.taskmanager.ui.list.menu.StateFilter;
-import com.maximka.taskmanager.ui.list.menu.SortField;
+import com.maximka.taskmanager.ui.screens.list.menu.StateFilter;
+import com.maximka.taskmanager.ui.screens.list.menu.SortField;
 import com.maximka.taskmanager.ui.data.TaskSummaryViewData;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;

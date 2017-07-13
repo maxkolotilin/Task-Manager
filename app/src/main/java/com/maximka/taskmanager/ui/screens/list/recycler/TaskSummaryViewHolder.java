@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.list.recycler;
+package com.maximka.taskmanager.ui.screens.list.recycler;
 
 import android.content.Context;
 import android.content.res.Resources;

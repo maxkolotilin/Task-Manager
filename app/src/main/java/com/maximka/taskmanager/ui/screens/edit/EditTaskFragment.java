@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.edit;
+package com.maximka.taskmanager.ui.screens.edit;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,7 +17,7 @@ import com.maximka.taskmanager.ui.base.BaseFragment;
 import com.maximka.taskmanager.ui.data.EditTaskInputDataSaver;
 import com.maximka.taskmanager.ui.data.EditTaskInputValues;
 import com.maximka.taskmanager.ui.data.TaskViewData;
-import com.maximka.taskmanager.ui.navigation.DialogManager;
+import com.maximka.taskmanager.dialogs.DialogManager;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 import com.maximka.taskmanager.utils.KeyboardUtils;

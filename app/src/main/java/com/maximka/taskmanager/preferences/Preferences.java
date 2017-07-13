@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-import com.maximka.taskmanager.ui.list.menu.SortField;
-import com.maximka.taskmanager.ui.list.menu.StateFilter;
+import com.maximka.taskmanager.ui.screens.list.menu.SortField;
+import com.maximka.taskmanager.ui.screens.list.menu.StateFilter;
 import com.maximka.taskmanager.utils.Assertion;
 
 public final class Preferences {

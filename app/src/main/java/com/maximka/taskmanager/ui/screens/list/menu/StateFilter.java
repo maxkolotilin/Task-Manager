@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.list.menu;
+package com.maximka.taskmanager.ui.screens.list.menu;
 
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;

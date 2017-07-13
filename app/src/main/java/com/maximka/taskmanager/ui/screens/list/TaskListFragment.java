@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.list;
+package com.maximka.taskmanager.ui.screens.list;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -20,11 +20,11 @@ import com.maximka.taskmanager.R;
 import com.maximka.taskmanager.preferences.Preferences;
 import com.maximka.taskmanager.recycler.adapter.ListAdapter;
 import com.maximka.taskmanager.ui.base.BaseFragment;
-import com.maximka.taskmanager.ui.list.menu.StateFilter;
-import com.maximka.taskmanager.ui.list.menu.SortField;
+import com.maximka.taskmanager.ui.screens.list.menu.StateFilter;
+import com.maximka.taskmanager.ui.screens.list.menu.SortField;
 import com.maximka.taskmanager.ui.data.TaskSummaryViewData;
-import com.maximka.taskmanager.ui.list.recycler.TaskListDiffCallback;
-import com.maximka.taskmanager.ui.list.recycler.TaskSummaryViewHolder;
+import com.maximka.taskmanager.ui.screens.list.recycler.TaskListDiffCallback;
+import com.maximka.taskmanager.ui.screens.list.recycler.TaskSummaryViewHolder;
 import com.maximka.taskmanager.ui.navigation.Navigator;
 import com.maximka.taskmanager.utils.Assertion;
 

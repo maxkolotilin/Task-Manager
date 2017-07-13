@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.list.recycler;
+package com.maximka.taskmanager.ui.screens.list.recycler;
 
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;

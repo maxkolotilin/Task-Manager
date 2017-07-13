@@ -1,4 +1,4 @@
-package com.maximka.taskmanager.ui.navigation;
+package com.maximka.taskmanager.dialogs;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
