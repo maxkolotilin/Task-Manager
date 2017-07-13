@@ -1,12 +1,15 @@
 package com.maximka.taskmanager.ui.data;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.annimon.stream.Objects;
 import com.maximka.taskmanager.data.TimeInterval;
 import com.maximka.taskmanager.utils.StringUtils;
 
 import java.util.Date;
 
+@SuppressWarnings("ConstantConditions")
 public final class EditTaskInputValues {
     @Nullable private final String mTitle;
     @Nullable private final String mDescription;
@@ -23,24 +26,24 @@ public final class EditTaskInputValues {
         mEstimatedTime = estimatedTime;
     }
 
-    @Nullable
+    @NonNull
     public String getTitle() {
-        return mTitle;
+        return Objects.requireNonNull(mTitle);
     }
 
-    @Nullable
+    @NonNull
     public String getDescription() {
-        return mDescription;
+        return Objects.requireNonNull(mDescription);
     }
 
-    @Nullable
+    @NonNull
     public Date getDueDate() {
-        return mDueDate;
+        return Objects.requireNonNull(mDueDate);
     }
 
-    @Nullable
+    @NonNull
     public TimeInterval getEstimatedTime() {
-        return mEstimatedTime;
+        return Objects.requireNonNull(mEstimatedTime);
     }
 
     public boolean isValid() {

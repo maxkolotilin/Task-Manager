@@ -26,7 +26,6 @@ final class EditTaskPresenter extends BasePresenter<EditTaskView> {
     @Override
     public void init() {}
 
-    @SuppressWarnings("ConstantConditions")
     void createNewTask(@NonNull final EditTaskInputValues inputValues,
                        @NonNull final Optional<String> editedTaskId) {
         Assertion.nonNull(inputValues, editedTaskId);
@@ -37,10 +36,10 @@ final class EditTaskPresenter extends BasePresenter<EditTaskView> {
                         .map(TaskData::newBuilder)
                         .or(() -> Optional.of(TaskData.newBuilder()))
                         .map(builder ->
-                                 builder.withTitle(Objects.requireNonNull(inputValues.getTitle()))
-                                        .withDescription(Objects.requireNonNull(inputValues.getDescription()))
-                                        .withDueDate(Objects.requireNonNull(inputValues.getDueDate()))
-                                        .withEstimatedTime(Objects.requireNonNull(inputValues.getEstimatedTime()))
+                                 builder.withTitle(inputValues.getTitle())
+                                        .withDescription(inputValues.getDescription())
+                                        .withDueDate(inputValues.getDueDate())
+                                        .withEstimatedTime(inputValues.getEstimatedTime())
                                         .build())
                         .ifPresent(mDataManager::createOrUpdateTask);
 

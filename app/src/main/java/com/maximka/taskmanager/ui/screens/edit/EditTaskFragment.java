@@ -104,10 +104,9 @@ public final class EditTaskFragment extends BaseFragment<EditTaskPresenter> impl
 
         initDialogManager();
 
-        Optional.ofNullable(savedInstanceState)
-                .executeIfAbsent(() ->
-                        getStringArgument(TASK_ID_ARG).ifPresent(getPresenter()::loadExistedTaskData)
-                );
+        if (savedInstanceState == null) {
+            getStringArgument(TASK_ID_ARG).ifPresent(getPresenter()::loadExistedTaskData);
+        }
     }
 
     private void initDialogManager() {
